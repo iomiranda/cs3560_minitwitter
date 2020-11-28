@@ -30,10 +30,10 @@ public class ProfileWindow extends JFrame implements ActionListener {
 	private DefaultListModel followListMode;
 	private JList followList;
 	private JScrollPane followScroll;
-	
+		
 	private TwitterFeed twitterFeed;
 	private int adminCount;
-	
+		
 	public ProfileWindow(User user) {
 		this.user = user;
 		tweetList = new DefaultListModel();
@@ -88,7 +88,9 @@ public class ProfileWindow extends JFrame implements ActionListener {
 		c.gridy = 0;
 		pane.add(button, c);
 
-		followListMode.addElement("FOLLOWING:");
+		followListMode.addElement("time_created: "+ user.getCreationTime());
+		followListMode.addElement("last_updated: "+ user.getCreationTime());
+		followListMode.addElement("[FOLLOWING]");
 		
 		for(int i=0 ; i<AdminControl.getInstance().getUserList().size() ; ++i) {
 			TreePanel tree = new TreePanel();
@@ -152,7 +154,7 @@ public class ProfileWindow extends JFrame implements ActionListener {
 		c.gridx = 0;
 		c.gridy = 1;
 		pane.add(tweetScroll, c);
-
+		
 		return pane;
 	}
 	
@@ -164,9 +166,27 @@ public class ProfileWindow extends JFrame implements ActionListener {
 		
 		if(action=="Post Tweet") {
 			
+			user.setLastUpdated(System.currentTimeMillis());
+			
+			followListMode.clear();
+			followListMode.addElement("time_created: "+ user.getCreationTime());
+			followListMode.addElement("last_updated: "+ user.getLastUpdated());
+			followListMode.addElement("[FOLLOWING]");
+			
+			for(int i=0 ; i<AdminControl.getInstance().getUserList().size() ; ++i) {
+				TreePanel tree = new TreePanel();
+				if(user.getName() != AdminControl.getInstance().getUserList().get(i).getName()) {
+					followListMode.addElement(AdminControl.getInstance().getUserList().get(i).getName());
+				}
+			}
+
 			tweetList.removeAllElements();
 			
+			
 			twitterFeed.addTweet(user.getName() + ": " + tweetTextPane.getText());
+			
+			Message.getInstance().pushTweet(tweetTextPane.getText()); //
+			
 			for(int i=0 ; i<twitterFeed.getTweetList().size() ; ++i) {
 				tweetList.addElement(twitterFeed.getTweetList().get(i));
 			}
@@ -182,6 +202,9 @@ public class ProfileWindow extends JFrame implements ActionListener {
 				JOptionPane.showMessageDialog(new JFrame(), "You have already followed "+ user.getName(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+		
+
+		
 				
 	}
 

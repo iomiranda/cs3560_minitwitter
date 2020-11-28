@@ -5,6 +5,8 @@ public abstract class ProfileInfo {
 	private int id;
 	private String name;
 	private int total;
+	private long creationTime;
+	private long lastUpdated;
 
 	public int getId() {
 		return id;
@@ -28,6 +30,22 @@ public abstract class ProfileInfo {
 
 	public void setName(String text) {
 		this.name = text;
+	}
+
+	public long getCreationTime() {
+		return creationTime;
+	}
+
+	public void setCreationTime(long creationTime) {
+		this.creationTime = creationTime;
+	}
+
+	public long getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(long lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 
 }

@@ -30,6 +30,9 @@ public class AdminControl implements ActionListener, TreeSelectionListener {
 	private LinkedList<User> groupCollection;
 	private HashMap<String, Integer> userMap;
 	private HashMap<String, Integer> groupMap;
+	private HashMap<User, Long> creationTimeMap;
+	private HashMap<User, Long> lastUpdatedMap;
+	private boolean idValid = true;
 
 
 	private static int MIN_ID = 10000000;
@@ -52,6 +55,8 @@ public class AdminControl implements ActionListener, TreeSelectionListener {
 		groupCollection = new LinkedList<>();
 		userMap = new HashMap<>();
 		groupMap = new HashMap<>();
+		creationTimeMap = new HashMap<>();
+		lastUpdatedMap = new HashMap<>();
 	}
 	
 	public void reloadFrame(String name) {
@@ -134,13 +139,19 @@ public class AdminControl implements ActionListener, TreeSelectionListener {
 	private JPanel centerControlPanel() {
 		JPanel pane = new JPanel();
 		pane.setLayout(new GridLayout(3,0));
-		pane.add(new JLabel(""));
+		
+		JButton buttonVal = new JButton("Validate ID's");
+		buttonVal.addActionListener(this);
+		pane.add(buttonVal);
 		
 		JButton button = new JButton("Open User View");
 		button.addActionListener(this);
 		pane.add(button);
 		
-		pane.add(new JLabel(""));
+		JButton buttonUp = new JButton("Last Updated User");
+		buttonUp.addActionListener(this);
+		pane.add(buttonUp);
+		
 		return pane;
 	}
 	
@@ -182,6 +193,8 @@ public class AdminControl implements ActionListener, TreeSelectionListener {
 		User user = new User();
 		user.setName(input);
 		user.setId(getRandomID(MIN_ID, MAX_ID));
+		long created = System.currentTimeMillis();
+		user.setCreationTime(created);
 		
 		if (input == null) {
 		    System.out.println("User closed window with no input");
@@ -195,9 +208,11 @@ public class AdminControl implements ActionListener, TreeSelectionListener {
 	
 	private int getRandomID(int min, int max) {
 		int randomNum = (int) ((Math.random() * (max - min)) + min);
+		idValid = false;
 		while(idCollection.contains(randomNum)) {
 			randomNum = (int) ((Math.random() * (max - min)) + min);
 		}
+		idValid = true;
 		idCollection.add(randomNum);
 	    return randomNum;
 	}
@@ -242,6 +257,19 @@ public class AdminControl implements ActionListener, TreeSelectionListener {
 		
 	}
 	
+	private User getLastUpdatedUser() {
+		User u = userCollection.get(0);
+		
+		for(int i=1 ; i<userCollection.size() ; ++i) {
+			if(u.getLastUpdated()<userCollection.get(i).getLastUpdated()) {
+				u = userCollection.get(i);
+			}
+		}
+		
+		return u;
+	}
+
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String action = e.getActionCommand();
@@ -267,6 +295,17 @@ public class AdminControl implements ActionListener, TreeSelectionListener {
 			JOptionPane.showMessageDialog(new JFrame(), "Total Messages: " + (TwitterFeed.getInstance().getTweetList().size()-1));
 			break;
 		case "Show Positive Percentage":
+			JOptionPane.showMessageDialog(new JFrame(), "Positive Percentage: " + Message.getInstance().getPositiveCount());
+			break;
+		case "Validate ID's":
+			if(idValid==true) {
+				JOptionPane.showMessageDialog(new JFrame(), "Identification Numbers Valid");
+			} else {
+				JOptionPane.showMessageDialog(new JFrame(), "Identification Numbers Invalid");
+			}
+			break;
+		case "Last Updated User":
+			JOptionPane.showMessageDialog(new JFrame(), "Last Updated User: " + getLastUpdatedUser().getId());
 			break;
 		default:
 			System.out.println("Error: Unknown Button Selected");

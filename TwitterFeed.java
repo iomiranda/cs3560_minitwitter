@@ -16,7 +16,7 @@ public class TwitterFeed {
 		if(instance==null) {
 			instance = new TwitterFeed();
 		} else {
-			System.out.println("Button Panel already has an instance");
+			System.out.println("Twitter Feed already has an instance");
 		}
 		return instance;
 	}
